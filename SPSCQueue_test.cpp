@@ -33,8 +33,9 @@ int real_time_loop() {
 	if (SetThreadPriority(this_thread, THREAD_PRIORITY_TIME_CRITICAL) == 0) {
 		std::cerr << "Failed to set thread priority. Error: " << GetLastError() << std::endl;
 	}
-	auto period = std::chrono::microseconds(10000);
+	auto period = std::chrono::microseconds(2000);
 	auto next_wake_time = std::chrono::steady_clock::now();
+	std::chrono::nanoseconds running_error = std::chrono::nanoseconds(0);
 	while (keep_running) {
 		count++;
 		next_wake_time += period;
@@ -45,7 +46,10 @@ int real_time_loop() {
 		//this just spin waiting
 		while (std::chrono::steady_clock::now() < next_wake_time) {
 		}
-		if (count == 100) {
+		auto error = std::chrono::steady_clock::now() - next_wake_time;
+		std::cout << std::chrono::duration_cast<std::chrono::nanoseconds>(error).count() << std::endl;
+		running_error = running_error + error;
+		if (count == 1000) {
 			keep_running = 0;
 		}
 	}
@@ -53,6 +57,7 @@ int real_time_loop() {
 	auto total_duration = end_time - (next_wake_time - period * count);
 	auto average_duration = total_duration / count;
 	std::cout << "Average loop duration: " << std::chrono::duration_cast<std::chrono::microseconds>(average_duration).count() << " microseconds\n" << std::endl;
+	std::cout << "Total running error: " << std::chrono::duration_cast<std::chrono::microseconds>(running_error).count() << " microseconds\n" << std::endl;
 	return 1;
 }
 
@@ -63,6 +68,8 @@ int main()
 	std::cout << "Hello World!\n";
 	std::thread rt_thread(real_time_loop);
 
+
+	rt_thread.join();
 }
 
 
