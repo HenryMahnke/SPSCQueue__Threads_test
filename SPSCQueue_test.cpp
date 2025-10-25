@@ -47,7 +47,7 @@ int real_time_loop() {
 		while (std::chrono::steady_clock::now() < next_wake_time) {
 		}
 		auto error = std::chrono::steady_clock::now() - next_wake_time;
-		std::cout << std::chrono::duration_cast<std::chrono::nanoseconds>(error).count() << std::endl;
+		//std::cout << std::chrono::duration_cast<std::chrono::nanoseconds>(error).count() << std::endl;
 		running_error = running_error + error;
 		if (count == 1000) {
 			keep_running = 0;
@@ -59,6 +59,9 @@ int real_time_loop() {
 	std::cout << "Average loop duration: " << std::chrono::duration_cast<std::chrono::microseconds>(average_duration).count() << " microseconds\n" << std::endl;
 	std::cout << "Total running error: " << std::chrono::duration_cast<std::chrono::microseconds>(running_error).count() << " microseconds\n" << std::endl;
 	return 1;
+	//for this test the total accumulated error was 10 microseconds over 1000 iterations, 
+	//this is 0.01 microseconds per iteration or 329 microseconds for a different iteration
+	// which is .329 microseconds per iteration on average
 }
 
 
